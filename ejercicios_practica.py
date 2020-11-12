@@ -52,6 +52,20 @@ def fill():
 
     # Se debe utilizar la sentencia insert_one o insert_many.
 
+    conn = TinyMongoClient()
+    db = conn[db_name]
+
+    group = [{"name": 'Roman', "age": 18, "grade": 1, "tutor": None},
+    {"name": 'Alejo', "age": 21, "grade": 3, "tutor": 'luciano'},
+    {"name": 'Vanesa', "age": 20, "grade": 2, "tutor": 'Gabriel'},
+    {"name": 'Alejandra', "age": 23, "grade": 6, "tutor": None},
+    {"name": 'Simon', "age": 22, "grade": 5, "tutor": 'Lucas'}]
+
+    db.estudiante.insert_many(group)
+
+    conn.close()
+
+
 
 def show():
     print('Comprovemos su contenido, ¿qué hay en la tabla?')
@@ -59,6 +73,18 @@ def show():
     # todos los documentos de la DB
     # Queda a su criterio serializar o no el JSON "dumps"
     #  para imprimirlo en un formato más "agradable"
+
+    conn = TinyMongoClient()
+    db = conn[db_name]
+
+    cursor = db.estudiante.find()
+
+    for doc in cursor:
+        print(doc)
+    
+    conn.close()
+
+
 
 
 def find_by_grade(grade):
@@ -70,6 +96,15 @@ def find_by_grade(grade):
     # en pantalla unicamente los siguiente campos por cada uno:
     # id / name / age
 
+    conn = TinyMongoClient()
+    db = conn[db_name]
+
+    estudiante_dato = db.estudiante.find_one({"grade": grade})
+    print(estudiante_dato)
+
+    conn.close()
+
+
 
 def insert(student):
     print('Nuevos ingresos!')
@@ -78,11 +113,30 @@ def insert(student):
 
     # El parámetro student deberá ser un JSON el cual se inserta en la db
 
+    conn = TinyMongoClient()
+    db = conn[db_name]
+
+    student_insert = db.estudiante.insert_one(student)
+    print(student_insert)
+
+    conn.close()
+
+
 
 def count(grade):
     print('Contar estudiantes')
     # Utilizar la sentencia find + count para contar
     # cuantos estudiantes pertenecen el grado "grade"
+
+    conn = TinyMongoClient()
+    db = conn[db_name]
+
+    count_grade = db.estudiante.find({"grade": grade}).count()
+    print(count_grade)
+
+    conn.close()
+
+
 
 
 if __name__ == '__main__':
@@ -90,13 +144,20 @@ if __name__ == '__main__':
     # Borrar la db
     clear()
 
-    # fill()
-    # show()
+    fill()
+    show()
 
     grade = 3
-    # find_by_grade(grade)
+    find_by_grade(grade)
 
-    # student = {....}
-    # insert(student)
+    student = {"name": "Jeronimo", 
+                "age": 20,
+                "grade": 4,
+                "tutor": "Alberto"
+                }
 
-    # count(grade)
+    insert(student)
+
+    count(6)
+
+
